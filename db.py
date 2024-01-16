@@ -1,38 +1,58 @@
 import sqlite3
 import userData
-#print(sqlite3.sqlite_version)
 
+#global
 connection = sqlite3.connect("habits.db")
+#id = 0
 
-habit_table = connection.execute("SELECT name FROM sqlite_master WHERE type=='table' AND name=='habits'").fetchall()
-if(habit_table == []):
+#database functions
+def create_table():
     connection.execute('''
     CREATE TABLE habits(
         id INTEGER PRIMARY KEY,
         week INTEGER ,
         sleep INTEGER,
         study INTEGER,
+        progress INTEGER,
         exercise INTEGER,
         mood INTEGER,
         stress TEXT          
     )
     ''')
 
-test_habits = [
-    (0, 1, 8, 4, 1, 7, "not much"),
-    (1, 1, 6, 2, 1, 8, "tests"),
-]
-connection.executemany("INSERT INTO habits VALUES(?,?,?,?,?,?,?)", test_habits)
-connection.commit()
+def insert_to_table(input_list, week):
+    # test_habits = [
+    #     (0, 1, 8, 4, 1, 7, "not much"),
+    #     (1, 1, 6, 2, 1, 8, "tests"),
+    # ]
+    
+    id = 2 #test
+    input_list = input_list.insert(0, week)
+    input_list = input_list.insert(0, id)
+    values = tuple(input_list)
+    print(values)
+    print(type(values))
 
-cur = connection.cursor()
-cur.execute("SELECT * FROM habits")
-rows = cur.fetchall()
-for row in rows:
-    print(row)
+    connection.executemany("INSERT INTO habits VALUES(?,?,?,?,?,?,?)", values)
+    connection.commit()
 
-#will probably take this line out later- figure out how to keep database and just keep updating it
-#connection.execute("DROP TABLE habits")
-connection.close()
+    cur = connection.cursor()
+    cur.execute("SELECT * FROM habits")
+    rows = cur.fetchall()
+    for row in rows:
+        print(row)
 
-# connection.execute("DROP TABLE habit_db")
+def main():
+
+    habit_table = connection.execute("SELECT name FROM sqlite_master WHERE type=='table' AND name=='habits'").fetchall()
+    if(habit_table == []):
+        create_table()
+    # else:
+    #     numrows = connection.execute("SELECT COUNT(*) FROM habits")
+    #     id = numrows + 1
+
+    connection.close()
+    # connection.execute("DROP TABLE habit_db")
+
+if __name__ == "__main__":
+    main()
